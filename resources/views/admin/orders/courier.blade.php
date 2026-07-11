@@ -5,17 +5,21 @@
         @include('bagisto-courier::admin.orders.courier', ['order' => $order])
 --}}
 @php
-    $courierOrder = app(\Rajibbinalam\BagistoCourier\Repositories\CourierOrderRepository::class)
-        ->findByOrderId($order->id);
+    $courierOrder = app(\Rajibbinalam\BagistoCourier\Repositories\CourierOrderRepository::class)->findByOrderId(
+        $order->id,
+    );
 @endphp
 
 <div class="bg-white rounded p-4 mt-4 border">
     <div class="flex items-center justify-between mb-3">
         <h3 class="text-lg font-semibold">Courier</h3>
 
-        @if (! $courierOrder)
-            <a href="{{ route('admin.courier.create.form', $order->id) }}" class="btn btn-lg btn-primary">
-                Create Courier Order
+        @if (!$courierOrder)
+            <a href="{{ route('admin.courier.create.form', $order->id) }}"
+            onclick="window.location.href = '{{ route('admin.courier.create.form', $order->id) }}'; return false;"
+            class="btn btn-lg btn-primary"
+            >
+            Create Courier Order
             </a>
         @else
             <form action="{{ route('admin.courier.sync', $order->id) }}" method="POST">
@@ -36,7 +40,8 @@
                 </tr>
                 <tr>
                     <td class="py-1 text-gray-500">Tracking ID</td>
-                    <td class="py-1 font-medium">{{ $courierOrder->tracking_number ?? $courierOrder->consignment_id }}</td>
+                    <td class="py-1 font-medium">{{ $courierOrder->tracking_number ?? $courierOrder->consignment_id }}
+                    </td>
                 </tr>
                 <tr>
                     <td class="py-1 text-gray-500">Courier Status</td>
@@ -53,18 +58,21 @@
     @endif
 
     <div class="border-t pt-3">
-        <form action="{{ route('admin.courier.status.update', $order->id) }}" method="POST" class="flex items-center gap-2">
+        <form action="{{ route('admin.courier.status.update', $order->id) }}" method="POST"
+            class="flex items-center gap-2">
             @csrf
             <label class="text-sm text-gray-600">Order Status</label>
             <select name="status" class="border rounded px-2 py-1 text-sm">
                 @foreach (['pending', 'pending_payment', 'processing', 'completed', 'canceled', 'closed', 'fraud'] as $status)
-                    <option value="{{ $status }}" @selected($order->status === $status)>{{ ucfirst(str_replace('_', ' ', $status)) }}</option>
+                    <option value="{{ $status }}" @selected($order->status === $status)>
+                        {{ ucfirst(str_replace('_', ' ', $status)) }}</option>
                 @endforeach
             </select>
             <button type="submit" class="btn btn-sm btn-outline-primary">Update</button>
         </form>
         <p class="text-xs text-gray-400 mt-1">
-            Directly overrides the order status and bypasses Bagisto's normal invoice/shipment workflow — use deliberately.
+            Directly overrides the order status and bypasses Bagisto's normal invoice/shipment workflow — use
+            deliberately.
         </p>
     </div>
 </div>
