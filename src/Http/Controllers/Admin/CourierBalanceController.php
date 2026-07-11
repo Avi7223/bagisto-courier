@@ -58,4 +58,31 @@ class CourierBalanceController extends Controller
 
         return redirect()->route('admin.courier.balance.index');
     }
+
+    /**
+     * Verifies API credentials work (auth/token check) without creating
+     * any real consignment — safe to click any time.
+     */
+    public function test(string $code)
+    {
+        try {
+            $response = $this->manager->testConnection($code);
+
+            session()->flash('balance_result', [
+                'courier' => $code,
+                'success' => $response->success,
+                'message' => $response->success
+                    ? ('Connection OK — ' . $response->message)
+                    : $response->message,
+            ]);
+        } catch (CourierException $e) {
+            session()->flash('balance_result', [
+                'courier' => $code,
+                'success' => false,
+                'message' => $e->getMessage(),
+            ]);
+        }
+
+        return redirect()->route('admin.courier.balance.index');
+    }
 }

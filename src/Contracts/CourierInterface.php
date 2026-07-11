@@ -55,4 +55,10 @@ interface CourierInterface
      * should return CourierResponse::failed() with a clear message.
      */
     public function getBalance(): CourierResponse;
+
+    /**
+     * Verifies API credentials actually work without creating any real
+     * consignment — used by the admin "Test Connection" button.
+     */
+    public function testConnection(): CourierResponse;
 }

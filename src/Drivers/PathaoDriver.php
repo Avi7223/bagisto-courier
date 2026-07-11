@@ -162,6 +162,27 @@ class PathaoDriver extends AbstractCourierDriver
         return $this->normalizeStatus($response->status ?? 'pending');
     }
 
+    /**
+     * Pathao has no public balance endpoint, so we verify credentials by
+     * fetching an OAuth access token instead — cheap and side-effect-free.
+     */
+    public function testConnection(): CourierResponse
+    {
+        try {
+            $token = $this->accessToken();
+
+            if (empty($token)) {
+                return CourierResponse::failed('Pathao did not return an access token — check Client ID, Client Secret, Username, and Password.');
+            }
+
+            return CourierResponse::success([
+                'message' => 'Pathao credentials are valid — access token issued successfully.',
+            ]);
+        } catch (\Rajibbinalam\BagistoCourier\Exceptions\CourierException $e) {
+            return CourierResponse::failed($e->getMessage());
+        }
+    }
+
     protected function normalizeStatus(string $raw): string
     {
         return match (strtolower($raw)) {

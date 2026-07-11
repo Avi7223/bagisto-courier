@@ -116,4 +116,12 @@ abstract class AbstractCourierDriver implements CourierInterface
             "{$this->getCode()} does not support balance checking."
         );
     }
+
+    public function testConnection(): \Rajibbinalam\BagistoCourier\DTO\CourierResponse
+    {
+        // Default: reuse the balance endpoint as a cheap credential check.
+        // Drivers without a balance endpoint (e.g. Pathao) should override
+        // this with something else that's safe to call (e.g. a token fetch).
+        return $this->getBalance();
+    }
 }

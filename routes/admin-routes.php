@@ -25,6 +25,7 @@ Route::group([
     Route::prefix('courier/balance')->name('admin.courier.balance.')->group(function () {
         Route::get('', [CourierBalanceController::class, 'index'])->name('index');
         Route::post('{code}', [CourierBalanceController::class, 'check'])->name('check');
+        Route::post('{code}/test', [CourierBalanceController::class, 'test'])->name('test');
     });
 });
 

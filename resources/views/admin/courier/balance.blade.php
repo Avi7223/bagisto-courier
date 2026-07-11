@@ -8,7 +8,7 @@
     @if ($result)
         <div class="mb-4 p-3 rounded {{ $result['success'] ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700' }}">
             <strong>{{ ucfirst($result['courier']) }}:</strong>
-            @if ($result['success'])
+            @if ($result['success'] && array_key_exists('charge', $result))
                 Balance: {{ number_format($result['charge'] ?? 0, 2) }}
             @else
                 {{ $result['message'] }}
@@ -32,8 +32,12 @@
                             <span class="text-xs text-blue-600">(default)</span>
                         @endif
                     </td>
-                    <td class="py-3 text-right">
-                        <form action="{{ route('admin.courier.balance.check', $code) }}" method="POST">
+                    <td class="py-3 text-right space-x-2">
+                        <form action="{{ route('admin.courier.balance.test', $code) }}" method="POST" class="inline">
+                            @csrf
+                            <button type="submit" class="btn btn-sm btn-outline-secondary">Test Connection</button>
+                        </form>
+                        <form action="{{ route('admin.courier.balance.check', $code) }}" method="POST" class="inline">
                             @csrf
                             <button type="submit" class="btn btn-sm btn-outline-primary">Check Balance</button>
                         </form>

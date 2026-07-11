@@ -104,4 +104,9 @@ class CourierManager
     {
         return $this->driver($code)->getBalance();
     }
+
+    public function testConnection(string $code): CourierResponse
+    {
+        return $this->driver($code)->testConnection();
+    }
 }

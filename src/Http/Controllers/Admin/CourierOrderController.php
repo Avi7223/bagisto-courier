@@ -5,6 +5,7 @@ namespace Rajibbinalam\BagistoCourier\Http\Controllers\Admin;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Route;
 use Rajibbinalam\BagistoCourier\Actions\SyncCourierStatusAction;
 use Rajibbinalam\BagistoCourier\DTO\OrderData;
 use Rajibbinalam\BagistoCourier\Exceptions\CourierException;
@@ -84,7 +85,7 @@ class CourierOrderController extends Controller
 
         session()->flash('success', 'Courier order is being created in the background. Refresh in a few seconds to see the tracking details.');
 
-        return redirect()->back();
+        return $this->redirectToOrder($orderId);
     }
 
     public function sync(int $orderId): RedirectResponse
@@ -123,6 +124,22 @@ class CourierOrderController extends Controller
         ]);
 
         session()->flash('success', 'Order status updated.');
+
+        return redirect()->back();
+    }
+
+    /**
+     * Tries common Bagisto admin order-view route names across versions,
+     * falling back to the referring page if none match — so a route-name
+     * mismatch never causes a hard error, just a slightly less ideal redirect.
+     */
+    protected function redirectToOrder(int $orderId): RedirectResponse
+    {
+        foreach (['admin.sales.orders.view', 'admin.orders.view'] as $routeName) {
+            if (Route::has($routeName)) {
+                return redirect()->route($routeName, $orderId);
+            }
+        }
 
         return redirect()->back();
     }
