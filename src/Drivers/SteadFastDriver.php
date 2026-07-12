@@ -63,7 +63,7 @@ class SteadFastDriver extends AbstractCourierDriver
 
         $consignment = $body['consignment'] ?? null;
 
-        if (($body['status'] ?? null) !== 'success' || ! $consignment) {
+        if (($body['status'] ?? null) != 200 || ! $consignment) {
             return CourierResponse::failed($body['message'] ?? 'Failed to create SteadFast order.', $body);
         }
 
@@ -91,7 +91,7 @@ class SteadFastDriver extends AbstractCourierDriver
             'headers' => $this->headers(),
         ]);
 
-        if (($body['status'] ?? null) !== 'success') {
+        if (($body['status'] ?? null) != 200) {
             return CourierResponse::failed($body['message'] ?? 'Unable to fetch tracking status.', $body);
         }
 
@@ -125,7 +125,7 @@ class SteadFastDriver extends AbstractCourierDriver
             'headers' => $this->headers(),
         ]);
 
-        if (($body['status'] ?? null) !== 200 && ($body['status'] ?? null) !== 'success') {
+        if (($body['status'] ?? null) != 200) {
             return CourierResponse::failed($body['message'] ?? 'Unable to fetch SteadFast balance.', $body);
         }
 
