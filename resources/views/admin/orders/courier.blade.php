@@ -17,6 +17,7 @@
         'item_quantity'     => (int) $order->total_qty_ordered,
     ];
 
+    $selectedCourier = old('courier', $defaultCourier);
     $inputClass = 'w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-700 transition-colors focus:border-gray-400 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:focus:border-gray-500';
     $labelClass = 'mb-1 block text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400';
 @endphp
@@ -113,9 +114,14 @@
 
                 <div>
                     <label class="{{ $labelClass }}">Courier</label>
-                    <select name="courier" class="{{ $inputClass }}">
+                    <select
+                        id="courier-select"
+                        name="courier"
+                        class="{{ $inputClass }}"
+                        onchange="toggleCourierFields(this.value)"
+                    >
                         @foreach ($availableCouriers as $code)
-                            <option value="{{ $code }}" @selected(old('courier', $defaultCourier) === $code)>{{ ucfirst($code) }}</option>
+                            <option value="{{ $code }}" @selected($selectedCourier === $code)>{{ ucfirst($code) }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -145,6 +151,31 @@
                         <label class="{{ $labelClass }}">COD Amount</label>
                         <input type="number" step="0.01" name="cod_amount" value="{{ old('cod_amount', $prefill['cod_amount']) }}" class="{{ $inputClass }}">
                     </div>
+                </div>
+
+                {{-- ===== Pathao-only fields ===== --}}
+                <div id="pathao-only-fields" class="{{ $selectedCourier === 'pathao' ? '' : 'hidden' }} space-y-3.5 rounded-md border border-dashed border-gray-200 p-3 dark:border-gray-700">
+                    <p class="text-xs font-medium text-gray-400">Pathao-specific</p>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="{{ $labelClass }}">Zone</label>
+                            <input type="text" name="recipient_zone" value="{{ old('recipient_zone') }}" class="{{ $inputClass }}" placeholder="e.g. Mirpur">
+                        </div>
+                        <div>
+                            <label class="{{ $labelClass }}">Area</label>
+                            <input type="text" name="recipient_area" value="{{ old('recipient_area') }}" class="{{ $inputClass }}" placeholder="e.g. Mirpur-10">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="{{ $labelClass }}">Item Weight (kg)</label>
+                        <input type="number" step="0.1" min="0.1" name="item_weight" value="{{ old('item_weight', 0.5) }}" class="{{ $inputClass }}">
+                    </div>
+
+                    <p class="text-[11px] text-gray-400">
+                        Pathao requires a valid Store ID (set under Configure &gt; Sales &gt; Courier Settings), plus Zone/Area matching Pathao's own location list.
+                    </p>
                 </div>
 
                 <div class="grid grid-cols-[1fr_90px] gap-3">
@@ -179,6 +210,26 @@
         </div>
     </div>
 </div>
+
+<script>
+    function toggleCourierFields(courierCode) {
+        var pathaoFields = document.getElementById('pathao-only-fields');
+        if (! pathaoFields) return;
+
+        if (courierCode === 'pathao') {
+            pathaoFields.classList.remove('hidden');
+        } else {
+            pathaoFields.classList.add('hidden');
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        var select = document.getElementById('courier-select');
+        if (select) {
+            toggleCourierFields(select.value);
+        }
+    });
+</script>
 
 @if ($errors->any())
     <script>

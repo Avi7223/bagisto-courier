@@ -62,9 +62,12 @@ class CourierOrderController extends Controller
             'recipient_phone'   => 'required|string|max:32',
             'recipient_address' => 'required|string|max:1000',
             'recipient_city'    => 'nullable|string|max:255',
+            'recipient_zone'    => 'nullable|string|max:255',
+            'recipient_area'    => 'nullable|string|max:255',
             'cod_amount'        => 'nullable|numeric|min:0',
             'item_description'  => 'nullable|string|max:500',
             'item_quantity'     => 'nullable|integer|min:1',
+            'item_weight'       => 'nullable|numeric|min:0.1',
         ]);
 
         $order = Order::findOrFail($orderId);
@@ -76,9 +79,12 @@ class CourierOrderController extends Controller
             'recipient_phone'         => $validated['recipient_phone'],
             'recipient_address'       => $validated['recipient_address'],
             'recipient_city'          => $validated['recipient_city'] ?? null,
+            'recipient_zone'          => $validated['recipient_zone'] ?? null,
+            'recipient_area'          => $validated['recipient_area'] ?? null,
             'cod_amount'              => $validated['cod_amount'] ?? 0,
             'item_description'        => $validated['item_description'] ?? null,
             'item_quantity'           => $validated['item_quantity'] ?? 1,
+            'item_weight'              => $validated['item_weight'] ?? 0.5,
         ]);
 
         CreateCourierOrderJob::dispatch($orderData->toArray(), $validated['courier']);
